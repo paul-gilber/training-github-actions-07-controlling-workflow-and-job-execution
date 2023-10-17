@@ -1,5 +1,14 @@
 # Section 6: Using Environment Variables & Secrets
 
+# Environment Variables
+# - Can be defined on Workflow level
+# - Can be defined on Job level (overrides Workflow level variables)
+
+# Secrets
+# - Can be defined on Organization level
+# - Can be defined on Repository level
+# Note: value cannot be viewed after creation, you can only update it.
+
 name: Deployment
 on:
   push:
@@ -15,8 +24,8 @@ jobs:
     env:
       # MongoDB
       MONGODB_CLUSTER_ADDRESS: pgilber.fyuznda.mongodb.net
-      MONGODB_USERNAME: github-action
-      MONGODB_PASSWORD: sQvCn0x1s1Kkj9hX
+      MONGODB_USERNAME: "${{ secrets.MONGODB_USERNAME }}"  # Uses Github Secret
+      MONGODB_PASSWORD: "${{ secrets.MONGODB_PASSWORD }}"  # Uses Github Secret
       # Project
       PORT: 8080
     environment: testing

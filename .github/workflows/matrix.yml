@@ -1,0 +1,59 @@
+# Section 7: Controlling Workflow & Job Execution
+
+# Evaluate conditions via expressions
+
+# Jobs
+# - `if` field
+
+# Steps
+# - `if` field
+# - `continue-on-error` field
+
+# Special Conditional Functions
+# - failure()   - true when any previous Step or Job failed
+# - success()   - true when none of the previous steps have failed
+# - always()    - causes the step to always execute even when cancelled
+# - cancelled() - true if the workflow has been cancelled
+
+# https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs
+
+name: Matrix
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    # https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs
+    strategy:
+      # ubuntu-latest: [16, 17, 18]
+      # windows-latest: [16, 17, 18]
+      matrix:
+        node-version: [16, 17, 18]
+        os: [ubuntu-latest, windows-latest]
+    # https://docs.github.com/en/actions/learn-github-actions/contexts#matrix-context
+    # Run 1 job per matrix.os entry in parallel
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Get code
+        uses: actions/checkout@v4
+      - name: Install NodeJS
+        uses: actions/setup-node@v3
+        with:
+          # https://docs.github.com/en/actions/learn-github-actions/contexts#matrix-context
+          # Run this step for every matrix.node-version entry
+          node-version: ${{ matrix.node-version }}
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
+      - name: Install dependencies
+        # Run if and only if no cache hit
+        # https://github.com/marketplace/actions/cache#outputs
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm ci
+      - name: Build website
+        id: build-website
+        run: npm run build

@@ -25,6 +25,9 @@ on:
 jobs:
   build:
     # https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs
+    # continue other jobs even when 1 job fails
+    continue-on-error: true
+    # by default, when 1 job fails, all other jobs will be skipped
     strategy:
       # Run 1 parallel job per combination of matrix.os and matrix.node-version entry
       # ubuntu-latest: 16
@@ -34,7 +37,7 @@ jobs:
       # windows-latest: 17
       # windows-latest: 18
       matrix:
-        node-version: [16, 17, 18]
+        node-version: [12, 16, 17, 18]
         os: [ubuntu-latest, windows-latest]
     # https://docs.github.com/en/actions/learn-github-actions/contexts#matrix-context
     # Run 1 job per matrix.os entry in parallel

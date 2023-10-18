@@ -96,6 +96,8 @@ jobs:
       - name: Deploy
         run: echo "Deploying..."
   report:
+    # Ensure this job runs after dependencies
+    needs: [lint, deploy]
     # Run this job if and only if any other job failed
     if: failure()
     runs-on: ubuntu-latest

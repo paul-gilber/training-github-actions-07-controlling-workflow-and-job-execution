@@ -105,4 +105,4 @@ jobs:
       - name: Output information
         run: |
           echo "Something whent wrong"
-          echo "${{ github }}"
+          echo "${{ toJson(github) }}"

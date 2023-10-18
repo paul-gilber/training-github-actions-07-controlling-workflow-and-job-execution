@@ -9,6 +9,12 @@
 # - `if` field
 # - `continue-on-error` field
 
+# Special Conditional Functions
+# - failure()   - true when any previous Step or Job failed
+# - success()   - true when none of the previous steps have failed
+# - always()    - causes the step to always execute even when cancelled
+# - cancelled() - true if the workflow has been cancelled
+
 name: Website Deployment
 on:
   push:
@@ -49,7 +55,8 @@ jobs:
       - name: Upload test report
         # Upload test report only when test failed
         # https://docs.github.com/en/actions/learn-github-actions/contexts#steps-context
-        if: steps.test-code.outcome == 'failure'
+        # https://docs.github.com/en/actions/learn-github-actions/expressions#failure
+        if: failure() && steps.test-code.outcome == 'failure'
         uses: actions/upload-artifact@v3
         with:
           name: test-report

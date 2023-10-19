@@ -24,7 +24,9 @@ on:
     inputs:
       artifact-name:
         description: "The name of the deployable artifact files"
-        required: true
+        # required: true
+        required: false
+        default: dist # default value when not required or not provided
         type: string
 jobs:
   deploy:

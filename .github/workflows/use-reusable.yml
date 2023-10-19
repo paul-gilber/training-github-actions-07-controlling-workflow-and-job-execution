@@ -94,6 +94,8 @@ jobs:
     # call reusable workflow, similar when calling marketplace actions
     # relative path to repository root
     uses: ./.github/workflows/reusable.yml
+    with:
+      artifact-name: dist-files
   report:
     # Ensure this job runs after dependencies
     needs: [lint, deploy]

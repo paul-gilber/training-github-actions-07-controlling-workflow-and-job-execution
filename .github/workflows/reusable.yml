@@ -17,11 +17,25 @@
 
 name: Reusable
 on:
-  # Trigger when this workflow is called by another worflow
+  # run workflow when called by another workflow
+  # will not trigger actual execution of "Reusable" workflow but instead included in "Use Reusable" workflow
   workflow_call:
+    # define "inputs" or parameters for this workflow
+    inputs:
+      artifact-name:
+        description: "The name of the deployable artifact files"
+        required: true
+        type: string
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Get Code
+        uses: actions/download-artifact@v3
+        with:
+          # https://docs.github.com/en/actions/learn-github-actions/contexts#inputs-context
+          name: ${{ inputs.artifact-name }}
+      - name: List files
+        run: ls
       - name: Deploy
         run: echo "Deploying..."

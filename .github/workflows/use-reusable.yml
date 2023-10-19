@@ -1,0 +1,107 @@
+# Section 7: Controlling Workflow & Job Execution
+
+# Evaluate conditions via expressions
+
+# Jobs
+# - `if` field
+
+# Steps
+# - `if` field
+# - `continue-on-error` field
+
+# Special Conditional Functions
+# - failure()   - true when any previous Step or Job failed
+# - success()   - true when none of the previous steps have failed
+# - always()    - causes the step to always execute even when cancelled
+# - cancelled() - true if the workflow has been cancelled
+
+name: Use Reusable 
+on:
+  push:
+    branches:
+      - main
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get code
+        uses: actions/checkout@v4
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
+      - name: Install dependencies
+        # Run if and only if no cache hit
+        # https://github.com/marketplace/actions/cache#outputs
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm ci
+      - name: Lint code
+        run: npm run lint
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get code
+        uses: actions/checkout@v4
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
+      - name: Install dependencies
+        # Run if and only if no cache hit
+        # https://github.com/marketplace/actions/cache#outputs
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm ci
+      - name: Test code
+        continue-on-error: true
+        id: test-code
+        run: npm run test
+      - name: Upload test report
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-report
+          path: test.json
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get code
+        uses: actions/checkout@v4
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
+      - name: Install dependencies
+        # Run if and only if no cache hit
+        # https://github.com/marketplace/actions/cache#outputs
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm ci
+      - name: Build website
+        id: build-website
+        run: npm run build
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist-files
+          path: dist
+  deploy:
+    needs: build
+    # call reusable workflow, similar when calling marketplace actions
+    # relative path to repository root
+    uses: ./.github/workflows/reusable.yml
+  report:
+    # Ensure this job runs after dependencies
+    needs: [lint, deploy]
+    # Run this job if and only if any other job failed
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Output information
+        run: |
+          echo "Something whent wrong"
+          echo "${{ toJson(github) }}"

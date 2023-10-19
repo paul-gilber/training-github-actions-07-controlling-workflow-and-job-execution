@@ -1,0 +1,27 @@
+# Section 7: Controlling Workflow & Job Execution
+
+# Evaluate conditions via expressions
+
+# Jobs
+# - `if` field
+
+# Steps
+# - `if` field
+# - `continue-on-error` field
+
+# Special Conditional Functions
+# - failure()   - true when any previous Step or Job failed
+# - success()   - true when none of the previous steps have failed
+# - always()    - causes the step to always execute even when cancelled
+# - cancelled() - true if the workflow has been cancelled
+
+name: Reusable
+on:
+  # Trigger when this workflow is called by another worflow
+  workflow_call:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy
+        run: echo "Deploying..."

@@ -23,16 +23,25 @@ on:
     # define "inputs" or parameters for this workflow
     inputs:
       artifact-name:
-        description: "The name of the deployable artifact files"
+        description: The name of the deployable artifact files
         # required: true
         required: false
         default: dist # default value when not required or not provided
         type: string
+    # define output values for this workflow
+    outputs:
+      result:
+        description: The result of the deployment operation
+        # can only reference job outputs
+        # https://docs.github.com/en/actions/learn-github-actions/contexts#jobs-context
+        value: ${{ jobs.deploy.outputs.outcome }}
     # secrets:
     #   some-secret:
     #     required: true
 jobs:
   deploy:
+    outputs:
+      outcome: ${{ steps.set-result.outputs.step-result }}
     runs-on: ubuntu-latest
     steps:
       - name: Get Code
@@ -44,3 +53,6 @@ jobs:
         run: ls
       - name: Deploy
         run: echo "Deploying..."
+      - name: Set result output
+        id: set-result
+        run: echo "step-result=success" >> $GITHUB_OUTPUT

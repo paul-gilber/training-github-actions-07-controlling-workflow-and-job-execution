@@ -99,6 +99,13 @@ jobs:
     # called workflow secrets are provided using `secrets` key and not inside `with` key
     # secrets:
     #   some-secret: ${{ secrets.some-secret }}
+  print-deploy-result:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print deploy output
+        # https://docs.github.com/en/actions/learn-github-actions/contexts#needs-context
+        run: echo "${{ needs.deploy.outputs.result }}"
   report:
     # Ensure this job runs after dependencies
     needs: [lint, deploy]

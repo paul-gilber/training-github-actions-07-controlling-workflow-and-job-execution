@@ -96,6 +96,9 @@ jobs:
     uses: ./.github/workflows/reusable.yml
     with:
       artifact-name: dist-files
+    # called workflow secrets are provided using `secrets` key and not inside `with` key
+    # secrets:
+    #   some-secret: ${{ secrets.some-secret }}
   report:
     # Ensure this job runs after dependencies
     needs: [lint, deploy]
